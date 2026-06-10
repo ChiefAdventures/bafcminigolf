@@ -1,5 +1,5 @@
 /* =====================================================
-   Pirate's Cove Glow Golf — shared logic
+   Big Apple Glow Golf — shared logic
    Holds the game state (players, ball colors, scores) and
    saves it in the browser so it carries across pages.
    ===================================================== */
@@ -18,7 +18,7 @@
     { name: "Teal",   hex: "#00f0d0", glow: "rgba(0,240,208,0.6)" },
     { name: "Pink",   hex: "#ff5ad0", glow: "rgba(255,90,208,0.6)" },
     { name: "Purple", hex: "#b14fff", glow: "rgba(177,79,255,0.6)" },
-    { name: "Gold",   hex: "#ffd34d", glow: "rgba(255,211,77,0.6)" },
+    { name: "Red",    hex: "#ff4d4d", glow: "rgba(255,77,77,0.6)" },
     { name: "Blue",   hex: "#3da5ff", glow: "rgba(61,165,255,0.6)" },
     { name: "Green",  hex: "#69ff8c", glow: "rgba(105,255,140,0.6)" }
   ];
@@ -84,6 +84,17 @@
     return order;
   }
 
+  // Short initials for tight spaces (e.g. scorecard grid headers).
+  // "Anne Bonny" -> "AB", "JFed" -> "JF", "Sam" -> "SA".
+  function initials(name) {
+    var parts = (name || "").trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "?";
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return parts.slice(0, 3).map(function (w) { return w[0]; }).join("").toUpperCase();
+  }
+
   // Expose a small API on window for the pages to use.
   window.PCGG = {
     STORAGE_KEY: STORAGE_KEY,
@@ -95,7 +106,8 @@
     loadState: loadState,
     saveState: saveState,
     resetState: resetState,
-    teeOrderForHole: teeOrderForHole
+    teeOrderForHole: teeOrderForHole,
+    initials: initials
   };
 
   // ---- Rules page: enable Continue only when the box is checked -------
