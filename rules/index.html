@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07071a">
+<title>Course Rules — Pirate's Cove Glow Golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<main class="stage">
+  <div class="card">
+    <h1 class="screen-title">Course Rules</h1>
+    <p class="screen-intro">Welcome to Pirate's Cove Glow Golf!</p>
+
+    <ul class="rules">
+      <li>Maximum 6 strokes per hole</li>
+      <li>Keep play moving — let faster groups play through</li>
+      <li>Return clubs and make sure you putt your ball into Hole 18</li>
+      <li>Have fun!</li>
+    </ul>
+
+    <label class="agree">
+      <input type="checkbox" id="agree-check" onchange="toggleAgree()">
+      <span class="box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#04231f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </span>
+      <span>I have read and agree to follow the course rules.</span>
+    </label>
+
+    <div>
+      <a class="btn-primary" id="continue-btn" href="../setup/" aria-disabled="true">Continue</a>
+    </div>
+
+    <div>
+      <a class="back-link" href="../home/">&larr; Back</a>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="logo-slot">
+    <div class="logo-placeholder">Logo coming soon</div>
+    <div class="biz">Big Apple Fun Center</div>
+  </div>
+</footer>
+
+<script src="../js/app.js"></script>
+<script>
+  /* The Continue link is locked until the box is checked.
+     We use a real <a> for navigation, so block clicks while disabled. */
+  (function () {
+    var check = document.getElementById("agree-check");
+    var btn = document.getElementById("continue-btn");
+
+    function sync() {
+      var on = check.checked;
+      btn.setAttribute("aria-disabled", on ? "false" : "true");
+      btn.classList.toggle("is-disabled", !on);
+    }
+    check.addEventListener("change", sync);
+    btn.addEventListener("click", function (e) {
+      if (check.checked === false) { e.preventDefault(); }
+    });
+    sync();
+  })();
+</script>
+</body>
+</html>
