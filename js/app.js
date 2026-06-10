@@ -65,6 +65,25 @@
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   }
 
+  // Compute the playing order for a given hole (0-based hole index).
+  // Hole 0 (the 1st hole) uses the original entry order. For later holes,
+  // sort by fewest strokes on the previous hole; break ties by stepping
+  // further back hole by hole; if still tied, fall back to entry order.
+  function teeOrderForHole(state, holeIndex) {
+    var order = state.players.map(function (_, i) { return i; });
+    if (holeIndex <= 0) return order;
+
+    order.sort(function (a, b) {
+      for (var k = holeIndex - 1; k >= 0; k--) {
+        var sa = state.players[a].scores[k];
+        var sb = state.players[b].scores[k];
+        if (sa !== sb) return sa - sb; // fewer strokes tee off first
+      }
+      return a - b; // perfect tie -> original starting order
+    });
+    return order;
+  }
+
   // Expose a small API on window for the pages to use.
   window.PCGG = {
     STORAGE_KEY: STORAGE_KEY,
@@ -75,7 +94,8 @@
     blankState: blankState,
     loadState: loadState,
     saveState: saveState,
-    resetState: resetState
+    resetState: resetState,
+    teeOrderForHole: teeOrderForHole
   };
 
   // ---- Rules page: enable Continue only when the box is checked -------
