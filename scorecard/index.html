@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07071a">
+<title>Final Scorecard — Pirate's Cove Glow Golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<main class="stage">
+  <div class="card">
+    <p class="play-eyebrow">Pirate's Cove Glow Golf</p>
+    <h1 class="screen-title">Final Scorecard</h1>
+    <p class="sc-date" id="sc-date"></p>
+
+    <div class="winner-banner" id="winner-banner"></div>
+
+    <div class="results" id="results"></div>
+
+    <div class="sc-grid-wrap">
+      <table class="sc-grid" id="sc-grid"></table>
+    </div>
+
+    <div class="sc-actions">
+      <button class="btn-download" id="download-btn" type="button">&darr; Download scorecard</button>
+      <button class="btn-primary" id="again-btn" type="button">Play Again</button>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="logo-slot">
+    <div class="logo-placeholder">Logo coming soon</div>
+    <div class="biz">Big Apple Fun Center</div>
+  </div>
+</footer>
+
+<script src="../js/app.js"></script>
+<script>
+  var state = PCGG.loadState();
+  if (!state.players || state.players.length === 0) {
+    window.location.href = "../setup/";
+  }
+
+  var TOTAL = PCGG.TOTAL_HOLES;
+  var PAR = state.par;
+  var PAR_TOTAL = PAR * TOTAL;
+
+  function playerTotal(p) {
+    return p.scores.reduce(function (a, b) { return a + b; }, 0);
+  }
+  function relStr(total) {
+    var d = total - PAR_TOTAL;
+    return d === 0 ? "E" : (d > 0 ? "+" + d : "" + d);
+  }
+
+  // ---- Date ----
+  var d = new Date();
+  document.getElementById("sc-date").textContent =
+    d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+
+  // ---- Ranked results ----
+  var ranked = state.players
+    .map(function (p, i) { return { p: p, i: i, total: playerTotal(p) }; })
+    .sort(function (a, b) { return a.total - b.total; });
+
+  var bestTotal = ranked[0].total;
+  var winners = ranked.filter(function (r) { return r.total === bestTotal; });
+
+  // ---- Winner banner ----
+  var banner = document.getElementById("winner-banner");
+  if (winners.length === 1) {
+    banner.textContent = "\uD83C\uDFF4\u200D\u2620\uFE0F " + winners[0].p.name + " wins!";
+  } else {
+    banner.textContent = "\uD83C\uDFF4\u200D\u2620\uFE0F It's a tie!";
+  }
+
+  // ---- Results list ----
+  var medals = ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"];
+  var resultsEl = document.getElementById("results");
+  ranked.forEach(function (r, idx) {
+    var row = document.createElement("div");
+    row.className = "result-row" + (r.total === bestTotal ? " winner" : "");
+    row.style.setProperty("--dot", r.p.color);
+    row.style.setProperty("--dot-glow", r.p.colorGlow);
+
+    var rel = r.total - PAR_TOTAL;
+    var relClass = rel < 0 ? "under" : (rel > 0 ? "over" : "");
+
+    row.innerHTML =
+      '<span class="medal">' + (medals[idx] || (idx + 1)) + '</span>' +
+      '<span class="rdot" aria-hidden="true"></span>' +
+      '<span class="rname"></span>' +
+      '<span class="rtotal">' + r.total + '</span>' +
+      '<span class="rrel ' + relClass + '">' + relStr(r.total) + '</span>';
+    row.querySelector(".rname").textContent = r.p.name;
+    resultsEl.appendChild(row);
+  });
+
+  // ---- Detailed grid (holes as rows, players as columns) ----
+  var grid = document.getElementById("sc-grid");
+  var thead = "<thead><tr><th>Hole</th><th>Par</th>";
+  state.players.forEach(function (p) {
+    thead += '<th><span class="hdr-dot" style="background:' + p.color +
+      ';box-shadow:0 0 6px ' + p.colorGlow + '"></span></th>';
+  });
+  thead += "</tr></thead>";
+
+  var tbody = "<tbody>";
+  for (var h = 0; h < TOTAL; h++) {
+    tbody += '<tr><td class="hole-c">' + (h + 1) + '</td><td class="par-c">' + PAR + '</td>';
+    state.players.forEach(function (p) {
+      tbody += "<td>" + (p.scores[h] || "-") + "</td>";
+    });
+    tbody += "</tr>";
+  }
+  tbody += '<tr class="total-row"><td class="lbl">Total</td><td>' + PAR_TOTAL + '</td>';
+  state.players.forEach(function (p) {
+    tbody += "<td>" + playerTotal(p) + "</td>";
+  });
+  tbody += "</tr></tbody>";
+
+  grid.innerHTML = thead + tbody;
+
+  // ---- Play Again ----
+  document.getElementById("again-btn").addEventListener("click", function () {
+    window.location.href = "../setup/";
+  });
+
+  // ---- Download as PNG (drawn on a canvas) ----
+  document.getElementById("download-btn").addEventListener("click", function () {
+    drawAndDownload();
+  });
+
+  function drawAndDownload() {
+    var players = state.players;
+    var nP = players.length;
+
+    // layout metrics
+    var padX = 50, padTop = 130, rowH = 46;
+    var labelW = 150, parW = 70, holeW = 64;
+    var cardW = padX * 2 + labelW + (TOTAL * holeW) + 90; // +90 for TOTAL col
+    var totalColX = padX + labelW + TOTAL * holeW;
+    var headerRows = 2; // hole row + par row
+    var bodyTop = padTop + 40;
+    var tableRows = headerRows + nP;
+    var cardH = bodyTop + tableRows * rowH + 90;
+
+    var scale = 2; // crisp on retina
+    var canvas = document.createElement("canvas");
+    canvas.width = cardW * scale;
+    canvas.height = cardH * scale;
+    var ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    // background
+    ctx.fillStyle = "#07071a";
+    ctx.fillRect(0, 0, cardW, cardH);
+
+    // title
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#00f0d0";
+    ctx.font = "700 40px Outfit, sans-serif";
+    ctx.fillText("Pirate's Cove Glow Golf", padX, 60);
+    ctx.fillStyle = "#8b93c8";
+    ctx.font = "400 22px Outfit, sans-serif";
+    ctx.fillText("Final Scorecard  \u00b7  " +
+      d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }), padX, 92);
+
+    var gridTop = bodyTop;
+    var holeRowY = gridTop;
+    var parRowY = gridTop + rowH;
+
+    // header labels
+    ctx.fillStyle = "#8b93c8";
+    ctx.font = "600 20px Outfit, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("HOLE", padX + 6, holeRowY + rowH / 2 + 7);
+    ctx.fillText("PAR", padX + 6, parRowY + rowH / 2 + 7);
+
+    ctx.textAlign = "center";
+    for (var h = 0; h < TOTAL; h++) {
+      var cx = padX + labelW + h * holeW + holeW / 2;
+      ctx.fillStyle = "#eef0ff";
+      ctx.font = "600 20px Outfit, sans-serif";
+      ctx.fillText(h + 1, cx, holeRowY + rowH / 2 + 7);
+      ctx.fillStyle = "#8b93c8";
+      ctx.font = "400 20px Outfit, sans-serif";
+      ctx.fillText(PAR, cx, parRowY + rowH / 2 + 7);
+    }
+    // TOTAL header col
+    var tcx = totalColX + 45;
+    ctx.fillStyle = "#ffd34d";
+    ctx.font = "700 18px Outfit, sans-serif";
+    ctx.fillText("TOTAL", tcx, holeRowY + rowH / 2 + 7);
+    ctx.fillStyle = "#8b93c8";
+    ctx.font = "400 20px Outfit, sans-serif";
+    ctx.fillText(PAR_TOTAL, tcx, parRowY + rowH / 2 + 7);
+
+    // player rows
+    players.forEach(function (p, pi) {
+      var ry = gridTop + (headerRows + pi) * rowH;
+      // color dot + name
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.arc(padX + 14, ry + rowH / 2, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#eef0ff";
+      ctx.font = "500 21px Outfit, sans-serif";
+      ctx.textAlign = "left";
+      var nm = p.name.length > 12 ? p.name.slice(0, 11) + "\u2026" : p.name;
+      ctx.fillText(nm, padX + 32, ry + rowH / 2 + 7);
+
+      ctx.textAlign = "center";
+      for (var h2 = 0; h2 < TOTAL; h2++) {
+        var cx2 = padX + labelW + h2 * holeW + holeW / 2;
+        var sc = p.scores[h2] || 0;
+        var diff = sc - PAR;
+        ctx.fillStyle = sc === 0 ? "#8b93c8" : (diff < 0 ? "#00f0d0" : (diff > 0 ? "#ff5ad0" : "#eef0ff"));
+        ctx.font = "500 21px Outfit, sans-serif";
+        ctx.fillText(sc || "-", cx2, ry + rowH / 2 + 7);
+      }
+      // total
+      ctx.fillStyle = "#ffd34d";
+      ctx.font = "700 22px Outfit, sans-serif";
+      ctx.fillText(playerTotal(p), tcx, ry + rowH / 2 + 7);
+    });
+
+    // grid lines
+    ctx.strokeStyle = "rgba(139,147,200,0.25)";
+    ctx.lineWidth = 1;
+    // vertical lines
+    for (var v = 0; v <= TOTAL; v++) {
+      var vx = padX + labelW + v * holeW;
+      ctx.beginPath();
+      ctx.moveTo(vx, gridTop);
+      ctx.lineTo(vx, gridTop + tableRows * rowH);
+      ctx.stroke();
+    }
+    // total col right edge
+    ctx.beginPath();
+    ctx.moveTo(totalColX + 90, gridTop);
+    ctx.lineTo(totalColX + 90, gridTop + tableRows * rowH);
+    ctx.stroke();
+    // left edge
+    ctx.beginPath();
+    ctx.moveTo(padX, gridTop);
+    ctx.lineTo(padX, gridTop + tableRows * rowH);
+    ctx.stroke();
+    // horizontal lines
+    for (var r = 0; r <= tableRows; r++) {
+      var hy = gridTop + r * rowH;
+      ctx.beginPath();
+      ctx.moveTo(padX, hy);
+      ctx.lineTo(totalColX + 90, hy);
+      ctx.stroke();
+    }
+
+    // footer
+    ctx.fillStyle = "#8b93c8";
+    ctx.font = "500 20px Outfit, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Big Apple Fun Center", cardW / 2, cardH - 30);
+
+    // trigger download
+    var link = document.createElement("a");
+    var stamp = d.toISOString().slice(0, 10);
+    link.download = "pirates-cove-scorecard-" + stamp + ".png";
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+</body>
+</html>
