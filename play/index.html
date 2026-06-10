@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#07071a">
-<title>Scoring — Pirate's Cove Glow Golf</title>
+<title>Scoring — Big Apple Glow Golf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 
 <main class="stage">
   <div class="card">
-    <p class="play-eyebrow">Pirate's Cove Glow Golf</p>
+    <p class="play-eyebrow">Big Apple Glow Golf</p>
 
     <div class="hole-head">
       <div class="block">
@@ -36,24 +36,66 @@
     <p class="tee-label">Tee order</p>
     <div class="score-list" id="score-list"></div>
 
+    <div class="demo-bar" id="demo-bar" hidden>
+      <span class="demo-tag">Demo mode</span>
+      <button class="demo-btn" id="demo-fill" type="button">Fill hole</button>
+      <button class="demo-btn" id="demo-skip" type="button">Skip to results</button>
+    </div>
+
     <div class="nav-row" id="nav-row"></div>
   </div>
 </main>
 
 <footer class="footer">
-  <div class="logo-slot">
-    <div class="logo-placeholder">Logo coming soon</div>
-    <div class="biz">Big Apple Fun Center</div>
+  <div class="logo-badge">
+    <img class="logo-img" src="../img/big-apple-logo.png" alt="Big Apple Fun Center — Kearney, NE">
   </div>
 </footer>
 
 <script src="../js/app.js"></script>
 <script>
-  var state = PCGG.loadState();
+  var params = new URLSearchParams(window.location.search);
+  var isDemo = params.has("demo");
+
+  var DEMO_NAMES = ["Blackbeard", "Anne Bonny", "Long John", "Calico Jack"];
+
+  function makeDemoState() {
+    var st = PCGG.blankState();
+    st.demo = true;
+    st.players = DEMO_NAMES.map(function (nm, i) {
+      return {
+        name: nm,
+        color: PCGG.COLORS[i].hex,
+        colorName: PCGG.COLORS[i].name,
+        colorGlow: PCGG.COLORS[i].glow,
+        scores: new Array(PCGG.TOTAL_HOLES).fill(0)
+      };
+    });
+    st.teeOrder = st.players.map(function (_, i) { return i; });
+    st.currentHole = 1;
+    return st;
+  }
+
+  var state;
+  if (isDemo) {
+    // Loading the demo URL always starts a fresh demo round.
+    state = makeDemoState();
+    PCGG.saveState(state);
+  } else {
+    state = PCGG.loadState();
+  }
+
+  var demoMode = !!state.demo;
 
   // Safety: if there are no players, go back to setup.
   if (!state.players || state.players.length === 0) {
     window.location.href = "../setup/";
+  }
+
+  // weighted random stroke, biased toward 2-4 (realistic)
+  function randomStroke() {
+    var pool = [1, 2, 2, 3, 3, 3, 4, 4, 5, 6];
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   var TOTAL = PCGG.TOTAL_HOLES;
@@ -100,9 +142,11 @@
       who.className = "who";
       who.innerHTML =
         '<span class="rank">' + ordinal(pos + 1) + '</span>' +
-        '<span class="pdot" aria-hidden="true"></span>' +
         '<span class="pname"></span>';
-      who.querySelector(".pname").textContent = p.name;
+      var nameEl = who.querySelector(".pname");
+      nameEl.textContent = p.name;
+      nameEl.style.color = p.color;
+      nameEl.style.textShadow = "0 0 8px " + p.colorGlow;
       card.appendChild(who);
 
       var grid = document.createElement("div");
@@ -180,6 +224,31 @@
     var ok = allScored();
     next.disabled = !ok;
     next.classList.toggle("is-disabled", !ok);
+  }
+
+  // ---- Demo mode controls ----
+  if (demoMode) {
+    var bar = document.getElementById("demo-bar");
+    bar.hidden = false;
+
+    document.getElementById("demo-fill").addEventListener("click", function () {
+      var h = holeIndex();
+      state.players.forEach(function (p) { p.scores[h] = randomStroke(); });
+      PCGG.saveState(state);
+      render();
+      window.scrollTo(0, 0);
+    });
+
+    document.getElementById("demo-skip").addEventListener("click", function () {
+      for (var h = holeIndex(); h < TOTAL; h++) {
+        state.players.forEach(function (p) {
+          if (p.scores[h] === 0) p.scores[h] = randomStroke();
+        });
+      }
+      state.currentHole = TOTAL;
+      PCGG.saveState(state);
+      window.location.href = "../scorecard/";
+    });
   }
 
   render();
