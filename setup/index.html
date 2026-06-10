@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#07071a">
-<title>Set Up Your Game — Pirate's Cove Glow Golf</title>
+<title>Set Up Your Game — Big Apple Glow Golf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,9 +36,8 @@
 </main>
 
 <footer class="footer">
-  <div class="logo-slot">
-    <div class="logo-placeholder">Logo coming soon</div>
-    <div class="biz">Big Apple Fun Center</div>
+  <div class="logo-badge">
+    <img class="logo-img" src="../img/big-apple-logo.png" alt="Big Apple Fun Center — Kearney, NE">
   </div>
 </footer>
 
@@ -64,21 +63,20 @@
       row.style.setProperty("--dot", color.hex);
       row.style.setProperty("--dot-glow", color.glow);
 
-      var dot = document.createElement("span");
-      dot.className = "player-dot";
-      dot.setAttribute("aria-hidden", "true");
-
       var input = document.createElement("input");
       input.type = "text";
       input.placeholder = "Player " + (i + 1) + " name";
       input.value = nm;
       input.setAttribute("aria-label", "Player " + (i + 1) + " name");
+      // The typed name glows in this player's neon color.
+      input.style.color = color.hex;
+      input.style.textShadow = "0 0 8px " + color.glow;
+      input.style.fontWeight = "600";
       input.addEventListener("input", function () {
         names[i] = input.value;
         syncButtons();
       });
 
-      row.appendChild(dot);
       row.appendChild(input);
 
       if (names.length > 1) {
