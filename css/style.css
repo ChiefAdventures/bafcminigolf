@@ -649,3 +649,4 @@ table.sc-grid tr.total-row td.lbl { color: var(--teal); }
 @media (prefers-reduced-motion: reduce) {
   .title .l1, .title .l2 { animation: none; }
 }
+  
