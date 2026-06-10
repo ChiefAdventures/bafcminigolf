@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07071a">
+<title>Set Up Your Game — Pirate's Cove Glow Golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<main class="stage">
+  <div class="card">
+    <div class="setup-top">
+      <a class="back-link" href="../rules/">&larr; Back</a>
+      <h1 class="screen-title" style="margin-bottom:0;">Set up<br>your game</h1>
+      <span class="spacer"></span>
+    </div>
+
+    <div class="players-head">
+      <span class="lbl">Players</span>
+      <span class="count" id="player-count">1 / 6</span>
+    </div>
+
+    <div class="player-list" id="player-list"></div>
+
+    <button class="btn-add" id="add-btn" onclick="addPlayer()">+ Add another player</button>
+
+    <div>
+      <button class="btn-primary is-disabled" id="start-btn" disabled onclick="startGame()">Start game</button>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="logo-slot">
+    <div class="logo-placeholder">Logo coming soon</div>
+    <div class="biz">Big Apple Fun Center</div>
+  </div>
+</footer>
+
+<script src="../js/app.js"></script>
+<script>
+  var COLORS = PCGG.COLORS;
+  var MAX = PCGG.MAX_PLAYERS;
+
+  // Working list of names while on this page.
+  var names = [""];
+
+  var listEl = document.getElementById("player-list");
+  var countEl = document.getElementById("player-count");
+  var addBtn = document.getElementById("add-btn");
+  var startBtn = document.getElementById("start-btn");
+
+  function render() {
+    listEl.innerHTML = "";
+    names.forEach(function (nm, i) {
+      var color = COLORS[i];
+      var row = document.createElement("div");
+      row.className = "player-row";
+      row.style.setProperty("--dot", color.hex);
+      row.style.setProperty("--dot-glow", color.glow);
+
+      var dot = document.createElement("span");
+      dot.className = "player-dot";
+      dot.setAttribute("aria-hidden", "true");
+
+      var input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Player " + (i + 1) + " name";
+      input.value = nm;
+      input.setAttribute("aria-label", "Player " + (i + 1) + " name");
+      input.addEventListener("input", function () {
+        names[i] = input.value;
+        syncButtons();
+      });
+
+      row.appendChild(dot);
+      row.appendChild(input);
+
+      if (names.length > 1) {
+        var rm = document.createElement("button");
+        rm.className = "player-remove";
+        rm.type = "button";
+        rm.innerHTML = "&times;";
+        rm.setAttribute("aria-label", "Remove player " + (i + 1));
+        rm.addEventListener("click", function () {
+          names.splice(i, 1);
+          render();
+          syncButtons();
+        });
+        row.appendChild(rm);
+      }
+
+      listEl.appendChild(row);
+    });
+    syncButtons();
+  }
+
+  function syncButtons() {
+    countEl.textContent = names.length + " / " + MAX;
+    addBtn.disabled = names.length >= MAX;
+
+    var allNamed = names.length > 0 && names.every(function (n) {
+      return n.trim().length > 0;
+    });
+    startBtn.disabled = !allNamed;
+    startBtn.classList.toggle("is-disabled", !allNamed);
+  }
+
+  function addPlayer() {
+    if (names.length >= MAX) return;
+    names.push("");
+    render();
+  }
+  window.addPlayer = addPlayer;
+
+  function startGame() {
+    var clean = names.map(function (n) { return n.trim(); });
+    if (clean.some(function (n) { return n.length === 0; })) return;
+
+    var state = PCGG.blankState();
+    state.players = clean.map(function (nm, i) {
+      return {
+        name: nm,
+        color: COLORS[i].hex,
+        colorName: COLORS[i].name,
+        colorGlow: COLORS[i].glow,
+        scores: new Array(PCGG.TOTAL_HOLES).fill(0)
+      };
+    });
+    // Initial tee order = entry order.
+    state.teeOrder = state.players.map(function (_, i) { return i; });
+    state.currentHole = 1;
+
+    PCGG.saveState(state);
+    window.location.href = "../play/";
+  }
+  window.startGame = startGame;
+
+  render();
+</script>
+</body>
+</html>
