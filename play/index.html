@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07071a">
+<title>Scoring — Pirate's Cove Glow Golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<main class="stage">
+  <div class="card">
+    <p class="play-eyebrow">Pirate's Cove Glow Golf</p>
+
+    <div class="hole-head">
+      <div class="block">
+        <span class="k">Hole</span>
+        <span class="big" id="hole-num">1</span>
+      </div>
+      <div class="block">
+        <span class="k">Par</span>
+        <span class="big par" id="hole-par">3</span>
+      </div>
+      <div class="block">
+        <span class="k">of</span>
+        <span class="big" id="hole-total">18</span>
+      </div>
+    </div>
+
+    <div class="progress"><div class="bar" id="progress-bar"></div></div>
+
+    <p class="tee-label">Tee order</p>
+    <div class="score-list" id="score-list"></div>
+
+    <div class="nav-row" id="nav-row"></div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="logo-slot">
+    <div class="logo-placeholder">Logo coming soon</div>
+    <div class="biz">Big Apple Fun Center</div>
+  </div>
+</footer>
+
+<script src="../js/app.js"></script>
+<script>
+  var state = PCGG.loadState();
+
+  // Safety: if there are no players, go back to setup.
+  if (!state.players || state.players.length === 0) {
+    window.location.href = "../setup/";
+  }
+
+  var TOTAL = PCGG.TOTAL_HOLES;
+  var MAX_STROKES = 6;
+
+  var holeNumEl = document.getElementById("hole-num");
+  var holeParEl = document.getElementById("hole-par");
+  var holeTotalEl = document.getElementById("hole-total");
+  var progressEl = document.getElementById("progress-bar");
+  var listEl = document.getElementById("score-list");
+  var navEl = document.getElementById("nav-row");
+
+  function holeIndex() { return state.currentHole - 1; }
+
+  function allScored() {
+    var h = holeIndex();
+    return state.players.every(function (p) { return p.scores[h] > 0; });
+  }
+
+  function ordinal(n) {
+    var s = ["th", "st", "nd", "rd"], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  function render() {
+    var h = holeIndex();
+    holeNumEl.textContent = state.currentHole;
+    holeParEl.textContent = state.par;
+    holeTotalEl.textContent = TOTAL;
+    progressEl.style.width = Math.round((state.currentHole / TOTAL) * 100) + "%";
+
+    var order = PCGG.teeOrderForHole(state, h);
+
+    listEl.innerHTML = "";
+    order.forEach(function (pi, pos) {
+      var p = state.players[pi];
+
+      var card = document.createElement("div");
+      card.className = "score-player";
+      card.style.setProperty("--dot", p.color);
+      card.style.setProperty("--dot-glow", p.colorGlow);
+
+      var who = document.createElement("div");
+      who.className = "who";
+      who.innerHTML =
+        '<span class="rank">' + ordinal(pos + 1) + '</span>' +
+        '<span class="pdot" aria-hidden="true"></span>' +
+        '<span class="pname"></span>';
+      who.querySelector(".pname").textContent = p.name;
+      card.appendChild(who);
+
+      var grid = document.createElement("div");
+      grid.className = "stroke-grid";
+      for (var s = 1; s <= MAX_STROKES; s++) {
+        (function (strokeVal) {
+          var b = document.createElement("button");
+          b.className = "stroke-btn" + (p.scores[h] === strokeVal ? " selected" : "");
+          b.type = "button";
+          b.textContent = strokeVal;
+          b.setAttribute("aria-label", p.name + ": " + strokeVal + " strokes");
+          b.addEventListener("click", function () {
+            state.players[pi].scores[h] = strokeVal;
+            PCGG.saveState(state);
+            // update just this row's button highlights + nav lock
+            grid.querySelectorAll(".stroke-btn").forEach(function (btn, idx) {
+              btn.classList.toggle("selected", idx + 1 === strokeVal);
+            });
+            updateNavLock();
+          });
+          grid.appendChild(b);
+        })(s);
+      }
+      card.appendChild(grid);
+      listEl.appendChild(card);
+    });
+
+    renderNav();
+  }
+
+  function renderNav() {
+    navEl.innerHTML = "";
+    var isFirst = state.currentHole === 1;
+    var isLast = state.currentHole === TOTAL;
+
+    if (!isFirst) {
+      var prev = document.createElement("button");
+      prev.className = "btn-prev";
+      prev.type = "button";
+      prev.textContent = "\u2190 Previous Hole";
+      prev.addEventListener("click", function () {
+        state.currentHole--;
+        PCGG.saveState(state);
+        render();
+        window.scrollTo(0, 0);
+      });
+      navEl.appendChild(prev);
+    }
+
+    var next = document.createElement("button");
+    next.className = "btn-primary";
+    next.type = "button";
+    next.id = "next-btn";
+    next.textContent = isLast ? "Finish Round" : "Next Hole \u2192";
+    next.addEventListener("click", function () {
+      if (!allScored()) return;
+      if (isLast) {
+        PCGG.saveState(state);
+        window.location.href = "../scorecard/";
+      } else {
+        state.currentHole++;
+        PCGG.saveState(state);
+        render();
+        window.scrollTo(0, 0);
+      }
+    });
+    navEl.appendChild(next);
+
+    updateNavLock();
+  }
+
+  function updateNavLock() {
+    var next = document.getElementById("next-btn");
+    if (!next) return;
+    var ok = allScored();
+    next.disabled = !ok;
+    next.classList.toggle("is-disabled", !ok);
+  }
+
+  render();
+</script>
+</body>
+</html>
