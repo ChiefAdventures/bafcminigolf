@@ -1,0 +1,290 @@
+/* =====================================================
+   Pirate's Cove Glow Golf — shared styles
+   Edit colors/fonts here once; every page picks them up.
+   ===================================================== */
+
+:root {
+  --bg: #07071a;
+  --bg-2: #0c0b24;
+  --teal: #00f0d0;
+  --purple: #b14fff;
+  --gold: #ffd34d;
+  --pink: #ff5ad0;
+  --text: #eef0ff;
+  --muted: #8b93c8;
+  --display: 'Pirata One', cursive;
+  --body: 'Outfit', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--body);
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(177,79,255,0.12), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(0,240,208,0.09), transparent 45%),
+    radial-gradient(circle at 50% 50%, #0c0b24, #07071a 70%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* subtle drifting blacklight specks */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(0,240,208,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 78% 18%, rgba(255,90,208,0.5), transparent),
+    radial-gradient(1px 1px at 35% 70%, rgba(177,79,255,0.5), transparent),
+    radial-gradient(1px 1px at 65% 60%, rgba(255,211,77,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 88% 78%, rgba(0,240,208,0.4), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* ---- Title (home) ---- */
+.title-wrap { margin-bottom: 2rem; }
+
+.title {
+  font-family: var(--display);
+  line-height: 0.92;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.title .l1 {
+  display: block;
+  font-size: clamp(3rem, 13vw, 5.5rem);
+  color: var(--teal);
+  text-shadow: 0 0 2px rgba(0,240,208,0.8), 0 0 10px rgba(0,240,208,0.4);
+  animation: flicker 6s infinite;
+}
+
+.title .l2 {
+  display: block;
+  font-size: clamp(2.4rem, 10.5vw, 4.6rem);
+  color: var(--pink);
+  text-shadow: 0 0 2px rgba(255,90,208,0.8), 0 0 10px rgba(255,90,208,0.4);
+  margin-top: 0.1em;
+  animation: flicker 7s infinite 0.4s;
+}
+
+@keyframes flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.72; }
+  94% { opacity: 1; }
+  96% { opacity: 0.85; }
+  97% { opacity: 1; }
+}
+
+.skull {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 0.6rem;
+  filter: drop-shadow(0 0 5px rgba(255,211,77,0.45));
+}
+
+.blurb {
+  font-size: 1.02rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 26rem;
+  margin: 0 auto 2.2rem;
+}
+.blurb strong { font-weight: 600; color: var(--teal); }
+
+/* ---- Primary glowing button (Play / Continue / Start) ---- */
+.btn-primary {
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #04231f;
+  background: var(--teal);
+  border: none;
+  border-radius: 999px;
+  padding: 0.95rem 3rem;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0,240,208,0.5), 0 0 20px rgba(0,240,208,0.25);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 12px rgba(0,240,208,0.65), 0 0 28px rgba(0,240,208,0.35);
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled,
+.btn-primary.is-disabled {
+  background: rgba(139,147,200,0.18);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  pointer-events: auto;
+}
+.btn-primary.is-disabled:hover { transform: none; box-shadow: none; }
+
+/* anchors styled as buttons need these resets */
+a.btn-primary { display: inline-block; text-decoration: none; }
+a.back-link { text-decoration: none; }
+
+/* slightly larger play button on the welcome screen */
+.btn-play { padding: 1rem 3.4rem; letter-spacing: 3px; font-size: 1.1rem; }
+
+/* ---- Footer logo slot ---- */
+.footer {
+  text-align: center;
+  padding: 1.5rem 1rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+.logo-slot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.85;
+}
+.logo-placeholder {
+  border: 1px dashed rgba(139,147,200,0.5);
+  border-radius: 10px;
+  padding: 10px 22px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.footer .biz {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ---- Section heading (inner pages) ---- */
+.screen-title {
+  font-family: var(--display);
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 2px rgba(0,240,208,0.8), 0 0 10px rgba(0,240,208,0.4);
+  margin-bottom: 0.4rem;
+  line-height: 1;
+}
+.screen-intro {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 1.8rem;
+}
+
+/* ---- Rules list ---- */
+.rules {
+  list-style: none;
+  text-align: left;
+  max-width: 22rem;
+  margin: 0 auto 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.rules li {
+  position: relative;
+  padding-left: 1.9rem;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--text);
+}
+.rules li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 6px rgba(255,90,208,0.7);
+}
+
+/* ---- Agree checkbox ---- */
+.agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  text-align: left;
+  max-width: 22rem;
+  margin: 0 auto 1.8rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--text);
+  user-select: none;
+}
+.agree input { position: absolute; opacity: 0; width: 0; height: 0; }
+.agree .box {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 2px solid var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.2s ease;
+  margin-top: 1px;
+}
+.agree .box svg { width: 14px; height: 14px; opacity: 0; transform: scale(0.6); transition: all 0.15s ease; }
+.agree input:checked + .box {
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: 0 0 8px rgba(0,240,208,0.5);
+}
+.agree input:checked + .box svg { opacity: 1; transform: scale(1); }
+.agree input:focus-visible + .box { outline: 2px solid var(--pink); outline-offset: 2px; }
+
+/* ---- Back link ---- */
+.back-link {
+  display: inline-block;
+  margin-top: 1.3rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--body);
+  font-size: 0.95rem;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+}
+.back-link:hover { color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .title .l1, .title .l2 { animation: none; }
+}
