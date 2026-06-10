@@ -12,6 +12,17 @@
   var TOTAL_HOLES = 18;
   var PAR_PER_HOLE = 3;
 
+  // Neon accent colors auto-assigned to players (in order).
+  // { name, hex, glow } — glow is a soft rgba for the dot's shadow.
+  var COLORS = [
+    { name: "Teal",   hex: "#00f0d0", glow: "rgba(0,240,208,0.6)" },
+    { name: "Pink",   hex: "#ff5ad0", glow: "rgba(255,90,208,0.6)" },
+    { name: "Purple", hex: "#b14fff", glow: "rgba(177,79,255,0.6)" },
+    { name: "Gold",   hex: "#ffd34d", glow: "rgba(255,211,77,0.6)" },
+    { name: "Blue",   hex: "#3da5ff", glow: "rgba(61,165,255,0.6)" },
+    { name: "Green",  hex: "#69ff8c", glow: "rgba(105,255,140,0.6)" }
+  ];
+
   // ---- State shape ----------------------------------------------------
   // {
   //   teamName: "",
@@ -59,6 +70,8 @@
     STORAGE_KEY: STORAGE_KEY,
     TOTAL_HOLES: TOTAL_HOLES,
     PAR_PER_HOLE: PAR_PER_HOLE,
+    COLORS: COLORS,
+    MAX_PLAYERS: COLORS.length,
     blankState: blankState,
     loadState: loadState,
     saveState: saveState,
