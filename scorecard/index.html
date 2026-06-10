@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#07071a">
-<title>Final Scorecard — Pirate's Cove Glow Golf</title>
+<title>Final Scorecard — Big Apple Glow Golf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 
 <main class="stage">
   <div class="card">
-    <p class="play-eyebrow">Pirate's Cove Glow Golf</p>
+    <p class="play-eyebrow">Big Apple Glow Golf</p>
     <h1 class="screen-title">Final Scorecard</h1>
     <p class="sc-date" id="sc-date"></p>
 
@@ -34,9 +34,8 @@
 </main>
 
 <footer class="footer">
-  <div class="logo-slot">
-    <div class="logo-placeholder">Logo coming soon</div>
-    <div class="biz">Big Apple Fun Center</div>
+  <div class="logo-badge">
+    <img class="logo-img" src="../img/big-apple-logo.png" alt="Big Apple Fun Center — Kearney, NE">
   </div>
 </footer>
 
@@ -94,11 +93,13 @@
 
     row.innerHTML =
       '<span class="medal">' + (medals[idx] || (idx + 1)) + '</span>' +
-      '<span class="rdot" aria-hidden="true"></span>' +
       '<span class="rname"></span>' +
       '<span class="rtotal">' + r.total + '</span>' +
       '<span class="rrel ' + relClass + '">' + relStr(r.total) + '</span>';
-    row.querySelector(".rname").textContent = r.p.name;
+    var rn = row.querySelector(".rname");
+    rn.textContent = r.p.name;
+    rn.style.color = r.p.color;
+    rn.style.textShadow = "0 0 8px " + r.p.colorGlow;
     resultsEl.appendChild(row);
   });
 
@@ -106,8 +107,8 @@
   var grid = document.getElementById("sc-grid");
   var thead = "<thead><tr><th>Hole</th><th>Par</th>";
   state.players.forEach(function (p) {
-    thead += '<th><span class="hdr-dot" style="background:' + p.color +
-      ';box-shadow:0 0 6px ' + p.colorGlow + '"></span></th>';
+    thead += '<th><span class="hdr-ini" style="color:' + p.color +
+      ';text-shadow:0 0 7px ' + p.colorGlow + '">' + PCGG.initials(p.name) + '</span></th>';
   });
   thead += "</tr></thead>";
 
@@ -167,7 +168,7 @@
     ctx.textAlign = "left";
     ctx.fillStyle = "#00f0d0";
     ctx.font = "700 40px Outfit, sans-serif";
-    ctx.fillText("Pirate's Cove Glow Golf", padX, 60);
+    ctx.fillText("Big Apple Glow Golf", padX, 60);
     ctx.fillStyle = "#8b93c8";
     ctx.font = "400 22px Outfit, sans-serif";
     ctx.fillText("Final Scorecard  \u00b7  " +
@@ -206,16 +207,12 @@
     // player rows
     players.forEach(function (p, pi) {
       var ry = gridTop + (headerRows + pi) * rowH;
-      // color dot + name
-      ctx.beginPath();
+      // name in the player's neon color
       ctx.fillStyle = p.color;
-      ctx.arc(padX + 14, ry + rowH / 2, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#eef0ff";
-      ctx.font = "500 21px Outfit, sans-serif";
+      ctx.font = "600 21px Outfit, sans-serif";
       ctx.textAlign = "left";
-      var nm = p.name.length > 12 ? p.name.slice(0, 11) + "\u2026" : p.name;
-      ctx.fillText(nm, padX + 32, ry + rowH / 2 + 7);
+      var nm = p.name.length > 13 ? p.name.slice(0, 12) + "\u2026" : p.name;
+      ctx.fillText(nm, padX + 10, ry + rowH / 2 + 7);
 
       ctx.textAlign = "center";
       for (var h2 = 0; h2 < TOTAL; h2++) {
@@ -271,7 +268,7 @@
     // trigger download
     var link = document.createElement("a");
     var stamp = d.toISOString().slice(0, 10);
-    link.download = "pirates-cove-scorecard-" + stamp + ".png";
+    link.download = "big-apple-scorecard-" + stamp + ".png";
     link.href = canvas.toDataURL("image/png");
     document.body.appendChild(link);
     link.click();
