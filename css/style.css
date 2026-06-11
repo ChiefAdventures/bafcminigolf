@@ -159,24 +159,16 @@ a.back-link { text-decoration: none; }
 /* ---- Footer logo slot ---- */
 .footer {
   text-align: center;
-  padding: 1.5rem 1rem 2rem;
+  padding: 1.25rem 1rem 1.75rem;
   position: relative;
   z-index: 1;
 }
 .logo-badge {
   display: inline-block;
-  padding: 12px 20px;
-  border-radius: 18px;
-  background: linear-gradient(155deg, #ffffff 0%, #eef0fb 100%);
-  box-shadow:
-    0 0 16px rgba(0,240,208,0.22),
-    0 0 30px rgba(177,79,255,0.16),
-    0 6px 18px rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.5);
 }
 .logo-img {
   display: block;
-  height: 116px;
+  height: 120px;
   width: auto;
 }
 
@@ -537,6 +529,7 @@ a.back-link { text-decoration: none; }
 .btn-prev:hover { border-color: var(--muted); background: rgba(255,255,255,0.08); }
 
 /* ---- Demo mode bar ---- */
+.demo-bar[hidden] { display: none; }
 .demo-bar {
   max-width: 26rem;
   margin: 0 auto 1rem;
