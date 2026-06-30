@@ -9,6 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BA Glow Golf">
+
 </head>
 <body>
 
@@ -30,6 +37,17 @@
     </p>
 
     <a class="btn-primary btn-play" href="../rules/">Play</a>
+
+    <div class="install-hint">
+      <button class="install-toggle" id="install-toggle" type="button" aria-expanded="false" aria-controls="install-panel">
+        <span>&#128241; Add to your Home Screen</span>
+        <span class="chev" aria-hidden="true">&#9662;</span>
+      </button>
+      <div class="install-panel" id="install-panel" hidden>
+        <p><strong>iPhone</strong> Tap the Share button, View More, then "Add to Home Screen."</p>
+        <p><strong>Android</strong> Tap the &#8942; menu, then "Add to Home Screen."</p>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -40,5 +58,16 @@
 </footer>
 
 <script src="../js/app.js"></script>
+<script>
+  (function () {
+    var t = document.getElementById("install-toggle");
+    var p = document.getElementById("install-panel");
+    t.addEventListener("click", function () {
+      var willOpen = p.hasAttribute("hidden");
+      if (willOpen) { p.removeAttribute("hidden"); t.setAttribute("aria-expanded", "true"); }
+      else { p.setAttribute("hidden", ""); t.setAttribute("aria-expanded", "false"); }
+    });
+  })();
+</script>
 </body>
 </html>
