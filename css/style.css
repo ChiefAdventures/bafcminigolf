@@ -18,14 +18,17 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+html { background: #06051a; }
 html, body { height: 100%; }
 
 body {
   font-family: var(--body);
   color: var(--text);
-  background:
-    radial-gradient(75% 45% at 50% 100%, rgba(0,240,208,0.055), transparent 70%),
-    radial-gradient(130% 95% at 50% 20%, #130f30 0%, #0b0922 48%, #06051a 100%);
+  background: linear-gradient(180deg,
+    #160f33 0%,
+    #100c29 30%,
+    #0a0820 60%,
+    #07061b 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -39,8 +42,7 @@ body::after {
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='200'%20height='200'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 200px 200px;
-  opacity: 0.05;
-  mix-blend-mode: soft-light;
+  opacity: 0.035;
   pointer-events: none;
   z-index: 0;
 }
@@ -681,6 +683,56 @@ table.sc-grid tr.total-row td.lbl { color: var(--teal); }
 }
 .btn-download:hover { transform: translateY(-2px); box-shadow: 0 0 14px rgba(255,90,208,0.45); }
 .btn-download:active { transform: scale(0.98); }
+
+/* ---- Add to Home Screen hint (home page only) ---- */
+.install-hint {
+  margin: 2.6rem auto 0;
+  padding-top: 1.7rem;
+  max-width: 17rem;
+  border-top: 1px solid rgba(139,147,200,0.18);
+}
+.install-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--body);
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.6rem;
+  transition: color 0.15s ease;
+}
+.install-toggle:hover { color: var(--text); }
+.install-toggle .chev { font-size: 0.75rem; transition: transform 0.2s ease; }
+.install-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.install-panel {
+  margin: 0.6rem auto 0;
+  max-width: 21rem;
+  text-align: left;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(139,147,200,0.25);
+  border-radius: 12px;
+  padding: 0.85rem 1.05rem;
+}
+.install-panel[hidden] { display: none; }
+.install-panel p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--text);
+}
+.install-panel p + p { margin-top: 0.55rem; }
+.install-panel strong {
+  display: block;
+  color: var(--teal);
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 1px;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .title .l1, .title .l2 { animation: none; }
