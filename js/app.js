@@ -1,5 +1,5 @@
 /* =====================================================
-   Big Apple Glow Golf — shared logic
+   Jurassic Play — shared logic
    Holds the game state (players, ball colors, scores) and
    saves it in the browser so it carries across pages.
    ===================================================== */
@@ -15,12 +15,12 @@
   // Neon accent colors auto-assigned to players (in order).
   // { name, hex, glow } — glow is a soft rgba for the dot's shadow.
   var COLORS = [
-    { name: "Teal",   hex: "#00f0d0", glow: "rgba(0,240,208,0.6)" },
-    { name: "Pink",   hex: "#ff5ad0", glow: "rgba(255,90,208,0.6)" },
-    { name: "Purple", hex: "#b14fff", glow: "rgba(177,79,255,0.6)" },
-    { name: "Red",    hex: "#ff4d4d", glow: "rgba(255,77,77,0.6)" },
-    { name: "Blue",   hex: "#3da5ff", glow: "rgba(61,165,255,0.6)" },
-    { name: "Green",  hex: "#69ff8c", glow: "rgba(105,255,140,0.6)" }
+    { name: "Amber",  hex: "#ff9f1c", glow: "rgba(255,159,28,0.6)" },
+    { name: "Teal",   hex: "#35c6e8", glow: "rgba(53,198,232,0.6)" },
+    { name: "Lime",   hex: "#9ad62b", glow: "rgba(154,214,43,0.6)" },
+    { name: "Red",    hex: "#ff5236", glow: "rgba(255,82,54,0.6)" },
+    { name: "Blue",   hex: "#4f86f2", glow: "rgba(79,134,242,0.6)" },
+    { name: "Violet", hex: "#b06bff", glow: "rgba(176,107,255,0.6)" }
   ];
 
   // ---- State shape ----------------------------------------------------
@@ -85,7 +85,7 @@
   }
 
   // Short initials for tight spaces (e.g. scorecard grid headers).
-  // "Anne Bonny" -> "AB", "JFed" -> "JF", "Sam" -> "SA".
+  // "Rex Raptor" -> "RR", "JFed" -> "JF", "Sam" -> "SA".
   function initials(name) {
     var parts = (name || "").trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return "?";
